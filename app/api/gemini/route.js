@@ -42,7 +42,7 @@ User question: ${lastMessage.content}`
           ],
           generationConfig: {
             temperature: 0.4,
-            maxOutputTokens: 300
+            maxOutputTokens: 800
           }
         })
       }
