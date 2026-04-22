@@ -1,27 +1,176 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-main: #060B18;
+  --surface: #0D1626;
+  --border: #1A2540;
+  --accent-blue: #3B6FE8;
+  --accent-green: #10B87A;
+  --accent-yellow: #F5A623;
+  --accent-red: #E84040;
+  --text-primary: #F0F4FF;
+  --text-secondary: #7A8BAA;
+  --text-muted: #3D4F6E;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
+html,
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-main);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+/* --- Scrollbar --- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* --- Selection --- */
+::selection {
+  background: rgba(59, 111, 232, 0.3);
+  color: var(--text-primary);
+}
+
+/* --- Page fade-in --- */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+main {
+  animation: fadeIn 0.2s ease-in-out both;
+}
+
+/* --- Map Node Pulse Ring --- */
+@keyframes mapRingPulse {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+.map-scan-ring {
+  transform-origin: center;
+  animation: mapRingPulse 2s ease-out infinite;
+}
+
+
+/* --- Navbar live dot pulse --- */
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 184, 122, 0.5); }
+  50%      { box-shadow: 0 0 6px 2px rgba(16, 184, 122, 0.35); }
+}
+
+.live-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* --- Typing dots (advisor page only) --- */
+@keyframes blink {
+  0%, 100% { opacity: 0.2; }
+  50%      { opacity: 1; }
+}
+
+/* --- Toast notification slide-in --- */
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) translateX(10px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateX(0);
+  }
+}
+
+/* --- Red pulsing dot (disruption KPI) --- */
+@keyframes pulse-red {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(232, 64, 64, 0.6); }
+  50%      { box-shadow: 0 0 8px 3px rgba(232, 64, 64, 0.35); }
+}
+
+.pulse-red-dot {
+  animation: pulse-red 1.5s ease-in-out infinite;
+}
+
+/* --- Disruption banner shimmer --- */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* --- Skeleton shimmer animation --- */
+@keyframes skeletonShimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* --- Map spinner rotation --- */
+@keyframes spinMap {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.map-spinner {
+  animation: spinMap 1s linear infinite;
+}
+
+/* --- Content reveal fade-in --- */
+@keyframes contentReveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.content-reveal {
+  animation: contentReveal 0.5s ease-out both;
+}
+
+/* --- Analyzing pulse for advisor --- */
+@keyframes analyzePulse {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1; }
+}
+
+/* --- Stitch Custom Overrides --- */
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+.map-mesh {
+    background-image: radial-gradient(circle at 2px 2px, rgba(69, 70, 77, 0.15) 1px, transparent 0);
+    background-size: 24px 24px;
+}
+.glow-primary {
+    filter: drop-shadow(0 0 8px rgba(0, 228, 117, 0.6));
+}
+.glow-error {
+    filter: drop-shadow(0 0 12px rgba(255, 59, 48, 0.8));
 }
