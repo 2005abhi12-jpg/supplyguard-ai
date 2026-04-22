@@ -152,25 +152,22 @@ export default function AIAdvisor() {
       });
 
       const data = await res.json();
-      const reply = data.reply || "Unable to get response. Please try again.";
-
-      // Detect API key issues
-      if (
-        reply.includes("Check your API key") ||
-        reply.includes("API key") ||
-        res.status === 502 ||
-        res.status === 500
-      ) {
+      
+      if (!res.ok) {
+        const errorMsg = data.error || "Unable to get response. Please try again.";
         setApiKeyMissing(true);
+        setMessages((prev) => [...prev, { role: "assistant", content: errorMsg, timestamp: new Date() }]);
+        return;
       }
-
+      
+      const reply = data.reply || "Unable to get response. Please try again.";
       setMessages((prev) => [...prev, { role: "assistant", content: reply, timestamp: new Date() }]);
     } catch (error) {
       console.error("API call failed:", error);
       setApiKeyMissing(true);
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Connection issue. Check your API key in .env.local", timestamp: new Date() },
+        { role: "assistant", content: "Connection error: " + error.message, timestamp: new Date() },
       ]);
     } finally {
       setIsTyping(false);

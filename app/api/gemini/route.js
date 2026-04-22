@@ -14,7 +14,7 @@ export async function POST(request) {
     const lastMessage = messages[messages.length - 1]
     
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -49,10 +49,11 @@ User question: ${lastMessage.content}`
     )
     
     if (!response.ok) {
-      const errorData = await response.json()
+      const errorData = await response.json().catch(() => ({}))
       console.error('Gemini API error:', response.status, errorData)
+      const errMsg = errorData?.error?.message || `API returned status ${response.status}`
       return Response.json(
-        { error: `API error: ${errorData.error?.message || 'Unknown error'}` },
+        { error: errMsg },
         { status: 502 }
       )
     }
