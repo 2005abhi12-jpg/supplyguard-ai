@@ -181,7 +181,7 @@ This project demonstrates how AI can be applied to supply chain management to:
 
 ## 👤 Author
 
-**Abhishek** — [@2005abhi12-jpg](https://github.com/2005abhi12-jpg)
+**Abhi** — [@2005abhi12-jpg](https://github.com/2005abhi12-jpg)
 
 ---
 
