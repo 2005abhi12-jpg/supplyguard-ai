@@ -1,3 +1,9 @@
+const MODELS = [
+  'gemini-2.0-flash-lite',
+  'gemini-2.0-flash',
+  'gemini-2.5-flash',
+]
+
 export async function POST(request) {
   try {
     const { messages, supplyChainContext } = await request.json()
@@ -13,17 +19,12 @@ export async function POST(request) {
 
     const lastMessage = messages[messages.length - 1]
     
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: 'user',
-              parts: [{
-                text: `You are SupplyGuard AI, a professional 
+    const requestBody = JSON.stringify({
+      contents: [
+        {
+          role: 'user',
+          parts: [{
+            text: `You are SupplyGuard AI, a professional 
 supply chain risk advisor.
               
 Current supply chain data:
@@ -37,32 +38,61 @@ Rules:
 - Sound like a real logistics expert
 
 User question: ${lastMessage.content}`
-              }]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.4,
-            maxOutputTokens: 800
-          }
-        })
+          }]
+        }
+      ],
+      generationConfig: {
+        temperature: 0.4,
+        maxOutputTokens: 800
       }
-    )
-    
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      console.error('Gemini API error:', response.status, errorData)
-      const errMsg = errorData?.error?.message || `API returned status ${response.status}`
-      return Response.json(
-        { error: errMsg },
-        { status: 502 }
-      )
+    })
+
+    let lastError = null
+
+    for (const model of MODELS) {
+      try {
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: requestBody
+          }
+        )
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}))
+          const errMsg = errorData?.error?.message || `Status ${response.status}`
+          console.error(`Model ${model} failed:`, errMsg)
+          
+          // If quota exceeded or rate limited, try next model
+          if (response.status === 429 || errMsg.includes('quota') || errMsg.includes('limit')) {
+            lastError = errMsg
+            continue
+          }
+          
+          // For other errors, return immediately
+          return Response.json({ error: errMsg }, { status: 502 })
+        }
+
+        const data = await response.json()
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 
+          'Unable to get response. Please try again.'
+        
+        return Response.json({ reply: text })
+        
+      } catch (fetchError) {
+        console.error(`Model ${model} fetch error:`, fetchError.message)
+        lastError = fetchError.message
+        continue
+      }
     }
-    
-    const data = await response.json()
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 
-      'Unable to get response. Please try again.'
-    
-    return Response.json({ reply: text })
+
+    // All models failed
+    return Response.json(
+      { error: `All models are rate-limited. Please wait 1 minute and try again. (${lastError})` },
+      { status: 429 }
+    )
     
   } catch (error) {
     console.error('Route error:', error)
