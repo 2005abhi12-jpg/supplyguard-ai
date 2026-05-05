@@ -8,7 +8,7 @@ A real-time supply chain monitoring and disruption management dashboard built fo
 
 ## 🚀 Live Demo
 
-Run locally at `http://localhost:3000` after setup.
+Run at https://supplyguard-ai-three.vercel.app/advisor after setup.
 
 ---
 
